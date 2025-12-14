@@ -45,11 +45,18 @@ qr-payments-mvp/
 - **Flutter** (latest stable)
 - **npm** or **yarn**
 
+### Clone Repository
+
+```bash
+git clone https://github.com/Philip38-hub/mypay.git
+cd mypay
+```
+
 ### 1️⃣ Start Backend (Port 4000)
 
 ```bash
 cd backend
-npm install  # Already done
+npm install
 npm start
 ```
 
@@ -62,7 +69,7 @@ Backend running on http://localhost:4000
 
 ```bash
 cd customer_web
-npm install  # Already done
+npm install
 npm run dev
 ```
 
@@ -77,7 +84,7 @@ VITE v5.0.8  ready in 123 ms
 
 ```bash
 cd merchant_app
-flutter pub get  # Already done
+flutter pub get 
 flutter run
 ```
 
