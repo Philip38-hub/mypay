@@ -8,13 +8,13 @@ mypay focuses on reducing payment errors, protecting merchant privacy, and deliv
 
 ## 🎯 MVP Features
 
-✅ **Merchant Onboarding** – Merchants register and create one or more businesses from a Flutter app
-✅ **Secure QR Generation** – Businesses generate signed, server-validated QR codes
-✅ **QR Validation** – Scanned QR links are verified server-side before payments are allowed
-✅ **Customer Web Checkout** – QR scan opens a React web UI with business details and amount entry
-✅ **STK Push Flow (Mocked)** – Payment request triggers a simulated STK push confirmation
-✅ **Session Management** – Short-lived payment sessions (e.g. 5 minutes) to prevent abuse
-✅ **Payment Confirmation** – Customers receive clear success or failure feedback after payment
+- ✅ **Merchant Onboarding** – Merchants register and create one or more businesses from a Flutter app
+- ✅ **Secure QR Generation** – Businesses generate signed, server-validated QR codes
+- ✅ **QR Validation** – Scanned QR links are verified server-side before payments are allowed
+- ✅ **Customer Web Checkout** – QR scan opens a React web UI with business details and amount entry
+- ✅ **STK Push Flow (Mocked)** – Payment request triggers a simulated STK push confirmation
+- ✅ **Session Management** – Short-lived payment sessions (e.g. 5 minutes) to prevent abuse
+- ✅ **Payment Confirmation** – Customers receive clear success or failure feedback after payment
 
 ## 📁 Project Structure
 
