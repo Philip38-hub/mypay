@@ -1,14 +1,20 @@
-# QR-Assisted Mobile Payment System MVP
+# mypay
 
-A minimal, end-to-end MVP demonstrating a complete QR-based payment lifecycle with Flutter merchant app, React customer web app, and Node.js backend.
+mypay is a QR-based mobile payment platform designed to simplify everyday payments for small businesses and their customers. It removes the need for customers to manually enter business numbers or account references by enabling a fast scan → enter amount → confirm payment flow using STK push.
+
+Merchants create and manage their businesses through a Flutter mobile app, where they generate a secure QR code to display at their point of sale. Customers scan the QR code with their phone camera, which opens a lightweight web payment page in their browser, allowing them to enter an amount and complete payment with a single confirmation on their phone.
+
+mypay focuses on reducing payment errors, protecting merchant privacy, and delivering a faster, more intuitive payment experience on top of existing mobile money infrastructure.
 
 ## 🎯 MVP Features
 
-✅ **QR Generation** - Merchants create businesses and generate signed QR codes  
-✅ **QR Validation** - Customer scans QR, backend validates signature & expiry  
-✅ **Session Management** - Short-lived sessions (5 min) for payment processing  
-✅ **Mock Payments** - Customers enter amount, payment completes in 2 seconds  
-✅ **Success Confirmation** - Payment details displayed to customer  
+✅ **Merchant Onboarding** – Merchants register and create one or more businesses from a Flutter app
+✅ **Secure QR Generation** – Businesses generate signed, server-validated QR codes
+✅ **QR Validation** – Scanned QR links are verified server-side before payments are allowed
+✅ **Customer Web Checkout** – QR scan opens a React web UI with business details and amount entry
+✅ **STK Push Flow (Mocked)** – Payment request triggers a simulated STK push confirmation
+✅ **Session Management** – Short-lived payment sessions (e.g. 5 minutes) to prevent abuse
+✅ **Payment Confirmation** – Customers receive clear success or failure feedback after payment
 
 ## 📁 Project Structure
 
