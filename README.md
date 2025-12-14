@@ -1,0 +1,415 @@
+# QR-Assisted Mobile Payment System MVP
+
+A minimal, end-to-end MVP demonstrating a complete QR-based payment lifecycle with Flutter merchant app, React customer web app, and Node.js backend.
+
+## 🎯 MVP Features
+
+✅ **QR Generation** - Merchants create businesses and generate signed QR codes  
+✅ **QR Validation** - Customer scans QR, backend validates signature & expiry  
+✅ **Session Management** - Short-lived sessions (5 min) for payment processing  
+✅ **Mock Payments** - Customers enter amount, payment completes in 2 seconds  
+✅ **Success Confirmation** - Payment details displayed to customer  
+
+## 📁 Project Structure
+
+```
+qr-payments-mvp/
+├── backend/              # Node.js + Express server
+│   ├── index.js         # Main server with all endpoints
+│   ├── package.json
+│   └── node_modules/
+├── merchant_app/        # Flutter mobile app
+│   ├── lib/main.dart    # Complete Flutter implementation
+│   ├── pubspec.yaml
+│   └── ...
+├── customer_web/        # React web app
+│   ├── src/
+│   │   ├── main.jsx
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   └── pages/
+│   │       ├── PaymentPage.jsx
+│   │       └── SuccessPage.jsx
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── package.json
+│   └── node_modules/
+└── README.md
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Node.js** (v14+)
+- **Flutter** (latest stable)
+- **npm** or **yarn**
+
+### 1️⃣ Start Backend (Port 4000)
+
+```bash
+cd backend
+npm install  # Already done
+npm start
+```
+
+Expected output:
+```
+Backend running on http://localhost:4000
+```
+
+### 2️⃣ Start React Customer Web App (Port 3000)
+
+```bash
+cd customer_web
+npm install  # Already done
+npm run dev
+```
+
+Expected output:
+```
+VITE v5.0.8  ready in 123 ms
+
+➜  Local:   http://localhost:3000/
+```
+
+### 3️⃣ Start Flutter Merchant App
+
+```bash
+cd merchant_app
+flutter pub get  # Already done
+flutter run
+```
+
+Select your target (Android emulator, iOS simulator, or web).
+
+---
+
+## 📱 Complete Demo Flow
+
+### Step 1: Create Business (Merchant App)
+
+1. Open Flutter app
+2. Tap **Home** tab (default)
+3. Tap **➕ Add Business** FAB
+4. **Step 1 - Business Details:**
+   - Name: `Mary's Mangoes`
+   - Message: `Fresh mangoes daily`
+   - Tap **Continue**
+5. **Step 2 - Payment Type:**
+   - Select: `Pochi la Biashara`
+   - Tap **Continue**
+6. **Step 3 - Payment Details:**
+   - Phone: `+254712345678`
+   - Tap **Create Business**
+
+### Step 2: View QR Code
+
+- QR code displays with business name and payment type
+- QR URL is shown (copyable)
+- Tap **Open Customer Page** to test
+
+### Step 3: Customer Payment (Web App)
+
+1. QR opens in browser → `http://localhost:3000/pay/{businessId}?v=1&exp=...&sig=...`
+2. Backend validates QR signature and expiry
+3. Customer sees:
+   - Business name: `Mary's Mangoes`
+   - Message: `Fresh mangoes daily`
+   - Payment type badge
+4. Enter amount: `150`
+5. Tap **Pay Now**
+6. Loading spinner (2 seconds)
+7. Success page shows:
+   - ✓ Payment Successful!
+   - Business: Mary's Mangoes
+   - Amount: KES 150.00
+   - Payment ID: `pay_xxx`
+
+### Step 4: Back to Merchant App
+
+- Tap **Back to Businesses**
+- Business appears in list
+- Tap to view QR again
+
+---
+
+## 🔐 QR Security (Implemented)
+
+### QR URL Format
+
+```
+http://localhost:3000/pay/{businessId}
+  ?v={qrVersion}
+  &exp={timestamp}
+  &sig={HMAC-SHA256}
+```
+
+### Validation Steps
+
+1. **Signature Validation** - HMAC-SHA256 with secret key
+2. **Expiry Check** - QR valid for 60 minutes
+3. **Business Verification** - Business must exist and be active
+4. **Session Creation** - 5-minute session for payment
+
+### Backend Endpoints
+
+#### Create Business
+```
+POST /api/business
+{
+  "displayName": "Mary's Mangoes",
+  "message": "Fresh mangoes daily",
+  "paymentType": "pochi",
+  "paymentDetails": { "phone": "+254712345678" }
+}
+→ Returns: { id, qrUrl, qrImage, expiresAt }
+```
+
+#### Validate QR & Create Session
+```
+POST /api/qr/validate
+{
+  "businessId": "biz_xxx",
+  "v": 1,
+  "exp": 1712345678,
+  "sig": "abc123..."
+}
+→ Returns: { sessionId, business }
+```
+
+#### Create Payment
+```
+POST /api/payments
+{
+  "sessionId": "sess_xxx",
+  "amount": 150
+}
+→ Returns: { paymentId, status: "pending", amount }
+→ After 2s: status becomes "success"
+```
+
+#### Get Payment Status
+```
+GET /api/payments/{paymentId}
+→ Returns: { id, status, amount }
+```
+
+---
+
+## 📊 In-Memory Data Models
+
+### Business
+```js
+{
+  id: "biz_xxx",
+  displayName: "Mary's Mangoes",
+  message: "Fresh mangoes daily",
+  paymentType: "pochi",
+  paymentDetails: { phone: "+254712345678" },
+  qrVersion: 1,
+  isActive: true,
+  createdAt: timestamp
+}
+```
+
+### QrSession
+```js
+{
+  id: "sess_xxx",
+  businessId: "biz_xxx",
+  expiresAt: timestamp,
+  createdAt: timestamp
+}
+```
+
+### Payment
+```js
+{
+  id: "pay_xxx",
+  businessId: "biz_xxx",
+  amount: 150,
+  status: "pending" | "success",
+  createdAt: timestamp,
+  completedAt: timestamp (if success)
+}
+```
+
+---
+
+## 🎨 UI/UX Features
+
+### Merchant App (Flutter)
+- **Bottom Navigation** - Home, Analytics, Profile tabs
+- **Business List** - View all created businesses
+- **Multi-step Form** - Business details → Payment type → Payment details
+- **QR Display** - Shows QR image, URL, and open button
+- **Analytics Placeholder** - Future feature
+- **Profile Placeholder** - Merchant info
+
+### Customer Web (React)
+- **Minimal Design** - Focus on payment flow
+- **QR Validation** - Automatic on page load
+- **Amount Input** - Simple number field
+- **Loading State** - Spinner during payment
+- **Success Screen** - Payment confirmation with details
+
+---
+
+## 🔌 How to Replace Mocks with Real Services
+
+### 1. M-Pesa STK Push Integration
+
+**Current:** Payments always succeed after 2 seconds  
+**Future:** Replace in `POST /api/payments` endpoint
+
+```js
+// backend/index.js - Replace mock logic with:
+const mpesaResponse = await initiateSTKPush({
+  phoneNumber: business.paymentDetails.phone,
+  amount: payment.amount,
+  accountReference: business.id
+});
+
+// Listen for M-Pesa callback webhook
+app.post('/api/mpesa/callback', (req, res) => {
+  const { Body } = req.body;
+  const resultCode = Body.stkCallback.ResultCode;
+  
+  if (resultCode === 0) {
+    payment.status = 'success';
+  } else {
+    payment.status = 'failed';
+  }
+});
+```
+
+### 2. Database Persistence
+
+**Current:** In-memory Maps (lost on restart)  
+**Future:** Replace with PostgreSQL/MongoDB
+
+```js
+// Replace:
+const businesses = new Map();
+
+// With:
+const businesses = await db.collection('businesses').find();
+```
+
+### 3. Authentication
+
+**Current:** No auth (mocked)  
+**Future:** Add JWT tokens
+
+```js
+// Merchant app: Login before creating businesses
+// Backend: Verify JWT on all endpoints
+// Customer: No auth needed (QR is the auth)
+```
+
+### 4. QR Logic (STAYS THE SAME)
+
+- QR signing remains unchanged
+- Validation logic stays stable
+- Signature algorithm (HMAC-SHA256) is production-ready
+- Just update the HMAC_SECRET to a strong key
+
+### 5. Payment Type Handling
+
+**Current:** Stored but not used  
+**Future:** Route to correct M-Pesa endpoint
+
+```js
+switch (business.paymentType) {
+  case 'pochi':
+    // Use Pochi la Biashara API
+    break;
+  case 'paybill':
+    // Use Paybill API with account number
+    break;
+  case 'till':
+    // Use Till API
+    break;
+}
+```
+
+---
+
+## ⚠️ MVP Limitations
+
+- ❌ No real M-Pesa integration
+- ❌ No authentication (anyone can create businesses)
+- ❌ No persistence (data lost on restart)
+- ❌ No error handling (happy path only)
+- ❌ No rate limiting
+- ❌ No logging
+- ❌ QR expires after 60 minutes (hardcoded)
+- ❌ Session expires after 5 minutes (hardcoded)
+
+---
+
+## ✅ Success Criteria
+
+If you can complete this flow, the MVP is working:
+
+1. ✅ Create business in Flutter app
+2. ✅ Generate QR code
+3. ✅ Open QR in browser
+4. ✅ See customer payment page
+5. ✅ Enter amount and pay
+6. ✅ See success confirmation
+
+---
+
+## 🛠️ Troubleshooting
+
+### Backend won't start
+```bash
+# Check if port 4000 is in use
+lsof -i :4000
+# Kill process if needed
+kill -9 <PID>
+```
+
+### React app won't start
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+### Flutter app can't reach backend
+- Ensure backend is running on `localhost:4000`
+- On Android emulator, use `10.0.2.2:4000` instead of `localhost:4000`
+- Check firewall settings
+
+### QR won't open in browser
+- Ensure React app is running on `localhost:3000`
+- Check browser console for errors
+- Verify QR URL format in Flutter app
+
+---
+
+## 📝 Next Steps
+
+1. **Add Database** - PostgreSQL with Prisma ORM
+2. **Add Auth** - JWT for merchants, QR for customers
+3. **Integrate M-Pesa** - Real STK Push via Safaricom API
+4. **Add Logging** - Winston or Pino for debugging
+5. **Add Tests** - Jest for backend, Flutter tests
+6. **Deploy** - Heroku for backend, Vercel for React
+7. **Mobile Optimization** - Responsive design, PWA
+8. **Analytics** - Track transactions, revenue per merchant
+
+---
+
+## 📄 License
+
+MIT
+
+---
+
+**Built with ❤️ for the MVP**
+
